@@ -58,7 +58,7 @@ def main(secret_key_file_path):
 
 
 def print_usage():
-    print("\nUsage: python3 generate_polka_peer_id.py <path_to_secret_key_file>")
+    print("\nUsage: genpeerid <path_to_secret_key_file>")
     print("\nThis script takes a file containing an ED25519 secret key as input,")
     print("generates the corresponding public key, and then calculates the PeerId")
     print("based on the public key following the format specified for Polkadot nodes.")
@@ -68,9 +68,9 @@ def print_usage():
     )
     print("suitable for use as a unique identifier within the Polkadot network.")
     print("\nExample:")
-    print("  python3 generate_polka_peer_id.py /path/to/your/secret_key_file")
+    print("  genpeerid /path/to/your/secret_key_file")
     print("\nOutput:")
-    print("  PeerId: <Your_PeerId_here>\n")
+    print("  <Your_PeerId_here>\n")
 
 
 if __name__ == "__main__":
