@@ -13,47 +13,16 @@ See deployment for notes on how to deploy the project on a live system.
 ## Installation with binary
 
 ```bash
+# Script checks signatures and hashes of the binary before executing it
 curl -sL https://raw.githubusercontent.com/rotkonetworks/genpeerid/master/scripts/install.sh | bash
 ```
 
 ## Building from source
 
-### Prerequisites
-
-- Python 3.8 or newer
-- Pip for Python3
-
-### Installing
-
-To set up a local development environment:
-
-1. Clone the repository:
-
 ```bash
-git clone https://github.com/yourusername/genpeerid.git
+cargo install --git https://github.com/rotkonetworks/genpeerid
+cargo run --release /path/to/secret_ed25519
 ```
-
-2. Navigate to the cloned directory:
-
-```bash
-cd genpeerid
-```
-
-3. Install the required Python packages:
-
-```bash
-pip install -r requirements.txt
-```
-
-## Usage
-
-To generate a PeerId, run:
-
-```bash
-python src/genpeerid.py <path_to_your_secret_key_file>
-```
-
-The script will output a PeerId that can be used within the Polkadot network.
 
 ## License
 
