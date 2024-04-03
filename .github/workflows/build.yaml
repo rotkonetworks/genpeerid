@@ -36,7 +36,8 @@ jobs:
 
       - name: Generate SHA512 hash
         run: |
-          sha512sum dist/genpeerid > dist/genpeerid.sha512
+          cd dist
+          sha512sum genpeerid > genpeerid.sha512
 
       - name: Import GPG Key
         run: |
@@ -53,6 +54,7 @@ jobs:
         run: |
           gpg --batch --yes --pinentry-mode loopback --passphrase "${{ secrets.GPG_PASSPHRASE }}" --detach-sign --armor --default-key hq@rotko.net --output dist/genpeerid.sig dist/genpeerid
           gpg --batch --yes --pinentry-mode loopback --passphrase "${{ secrets.GPG_PASSPHRASE }}" --detach-sign --armor --default-key hq@rotko.net --output dist/genpeerid.sha512.sig dist/genpeerid.sha512
+
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v2
