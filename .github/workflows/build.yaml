@@ -23,7 +23,7 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.9'
-          cache: 'pip' # caching pip dependencies
+          cache: 'pip'
 
       - name: Install dependencies
         run: |
@@ -34,11 +34,28 @@ jobs:
         run: |
           pyinstaller --onefile --clean src/genpeerid.py
 
-      - name: Upload Artifact
+      - name: Generate SHA512 hash
+        run: |
+          sha512sum dist/genpeerid > dist/genpeerid.sha512
+
+      - name: Import GPG Key
+        run: |
+          echo "${{ secrets.HQ_ROTKO_PGP }}" | gpg --batch --import
+
+      - name: Sign binary and hash
+        run: |
+          gpg --batch --yes --detach-sign --armor --default-key hq@rotko.net --output dist/genpeerid.sig dist/genpeerid
+          gpg --batch --yes --detach-sign --armor --default-key hq@rotko.net --output dist/genpeerid.sha512.sig dist/genpeerid.sha512
+
+      - name: Upload Artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: genpeerid
-          path: dist/genpeerid
+          name: genpeerid-and-signatures
+          path: |
+            dist/genpeerid
+            dist/genpeerid.sig
+            dist/genpeerid.sha512
+            dist/genpeerid.sha512.sig
 
       - name: Bump version and tag
         id: bump_version
@@ -52,5 +69,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GH_PAT }}
         with:
-          files: dist/genpeerid
+          files: |
+            dist/genpeerid
+            dist/genpeerid.sig
+            dist/genpeerid.sha512
+            dist/genpeerid.sha512.sig
           tag_name: ${{ steps.bump_version.outputs.new_tag }}
