@@ -3,7 +3,7 @@ name: Build and Publish Binary
 on:
   push:
     branches:
-      #- master
+      - master
       - rewrite_in_rust
   workflow_dispatch:
 
