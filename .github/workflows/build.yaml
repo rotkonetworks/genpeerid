@@ -41,11 +41,18 @@ jobs:
       - name: Import GPG Key
         run: |
           echo "${{ secrets.HQ_ROTKO_PGP }}" | gpg --batch --import
+        env:
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+
+      - name: Configure GPG
+        run: |
+          echo "allow-loopback-pinentry" >> ~/.gnupg/gpg-agent.conf
+          gpg-connect-agent reloadagent /bye
 
       - name: Sign binary and hash
         run: |
-          gpg --batch --yes --detach-sign --armor --default-key hq@rotko.net --output dist/genpeerid.sig dist/genpeerid
-          gpg --batch --yes --detach-sign --armor --default-key hq@rotko.net --output dist/genpeerid.sha512.sig dist/genpeerid.sha512
+          gpg --batch --yes --pinentry-mode loopback --passphrase "${{ secrets.GPG_PASSPHRASE }}" --detach-sign --armor --default-key hq@rotko.net --output dist/genpeerid.sig dist/genpeerid
+          gpg --batch --yes --pinentry-mode loopback --passphrase "${{ secrets.GPG_PASSPHRASE }}" --detach-sign --armor --default-key hq@rotko.net --output dist/genpeerid.sha512.sig dist/genpeerid.sha512
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v2
