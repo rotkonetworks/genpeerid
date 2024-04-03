@@ -34,6 +34,9 @@ jobs:
           name: genpeerid
           path: dist/genpeerid
 
+      - name: Configure Git Safe Directory
+        run: git config --global --add safe.directory /github/workspace
+
       - name: Bump version and tag
         id: bump_version
         uses: anothrNick/github-tag-action@1.26.0
@@ -51,3 +54,13 @@ jobs:
           release_name: Release ${{ steps.bump_version.outputs.new_tag }}
           draft: false
           prerelease: false
+
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./dist/genpeerid
+          asset_name: genpeerid
+          asset_content_type: application/octet-stream
