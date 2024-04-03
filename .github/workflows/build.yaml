@@ -55,9 +55,11 @@ jobs:
 
       # Bump version and tag
       - name: Bump version and tag
+        id: bump_version
         uses: anothrNick/github-tag-action@v1
         with:
-          github_token: ${{ secrets.GH_PAT }}
+          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+          WITH_V: false
 
       # Create GitHub Release
       - name: Create Release
