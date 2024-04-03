@@ -33,3 +33,21 @@ jobs:
         with:
           name: genpeerid
           path: dist/genpeerid
+
+      - name: Bump version and tag
+        id: bump_version
+        uses: anothrNick/github-tag-action@1.26.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+          DEFAULT_BUMP: patch
+          RELEASE_BRANCHES: master
+
+      - name: Create Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+        with:
+          tag_name: ${{ steps.bump_version.outputs.new_tag }}
+          release_name: Release ${{ steps.bump_version.outputs.new_tag }}
+          draft: false
+          prerelease: false
