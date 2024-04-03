@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - master
-      - rewrite_in_rust
   workflow_dispatch:
 
 jobs:
@@ -57,7 +56,7 @@ jobs:
       - name: Bump version and tag
         id: bump_version
         uses: anothrNick/github-tag-action@v1
-        with:
+        env:
           GITHUB_TOKEN: ${{ secrets.GH_PAT }}
           WITH_V: false
 
