@@ -55,7 +55,7 @@ jobs:
 
       # Bump version and tag
       - name: Bump version and tag
-        uses: anothrNick/github-tag-action@v1.67.0
+        uses: anothrNick/github-tag-action@v1
         with:
           github_token: ${{ secrets.GH_PAT }}
 
