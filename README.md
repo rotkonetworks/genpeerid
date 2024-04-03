@@ -10,11 +10,10 @@ These instructions will help you get a copy of `genpeerid` up and
 running on your local machine for development and testing purposes.
 See deployment for notes on how to deploy the project on a live system.
 
-## Using gh workflow built binary
+## Installation with binary
+
 ```bash
-curl -sL $(curl -s https://api.github.com/repos/rotkonetworks/genpeerid/releases/latest | grep -oP '"browser_download_url": "\K(.*?)(?=")') -o genpeerid
-chmod +x genpeerid
-./genpeerid ../chains/$network/network/secret_ed25519
+curl -sL https://raw.githubusercontent.com/rotkonetworks/genpeerid/master/scripts/install.sh | bash
 ```
 
 ## Building from source
@@ -51,16 +50,10 @@ pip install -r requirements.txt
 To generate a PeerId, run:
 
 ```bash
-python src/generate_polka_peer_id.py <path_to_your_secret_key_file>
+python src/genpeerid.py <path_to_your_secret_key_file>
 ```
 
 The script will output a PeerId that can be used within the Polkadot network.
-
-## Building the Binary
-
-The GitHub Actions workflow automatically builds a binary for `genpeerid`.
-To download the latest binary, visit the "Actions" tab in the GitHub repository
-and select the latest successful build.
 
 ## License
 
