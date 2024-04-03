@@ -3,84 +3,71 @@ name: Build and Publish Binary
 on:
   push:
     branches:
-      - master
+      #- master
+      - rewrite_in_rust
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
-    permissions:
-      contents: write
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: '0'
+      - uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.9'
-          cache: 'pip'
+      # Setup Rust toolchain; automatically matches the @rev of the action
+      - uses: dtolnay/rust-toolchain@stable
 
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt pyinstaller
+      # Build the release binary
+      - name: Build Release Binary
+        run: cargo build --release
 
-      - name: Build binary with PyInstaller
-        run: |
-          pyinstaller --onefile --clean src/genpeerid.py
-
+      # Generate SHA512 hash for the binary
       - name: Generate SHA512 hash
         run: |
-          cd dist
-          sha512sum genpeerid > genpeerid.sha512
+          (cd target/release && sha512sum genpeerid > genpeerid.sha512)
 
+      # Import GPG Key
       - name: Import GPG Key
-        run: |
-          echo "${{ secrets.HQ_ROTKO_PGP }}" | gpg --batch --import
-        env:
-          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+        run: echo "${{ secrets.HQ_ROTKO_PGP }}" | gpg --batch --import
 
+      # Configure GPG
       - name: Configure GPG
         run: |
           echo "allow-loopback-pinentry" >> ~/.gnupg/gpg-agent.conf
           gpg-connect-agent reloadagent /bye
 
+      # Sign binary and hash
       - name: Sign binary and hash
         run: |
-          gpg --batch --yes --pinentry-mode loopback --passphrase "${{ secrets.GPG_PASSPHRASE }}" --detach-sign --armor --default-key hq@rotko.net --output dist/genpeerid.sig dist/genpeerid
-          gpg --batch --yes --pinentry-mode loopback --passphrase "${{ secrets.GPG_PASSPHRASE }}" --detach-sign --armor --default-key hq@rotko.net --output dist/genpeerid.sha512.sig dist/genpeerid.sha512
+          gpg --batch --yes --pinentry-mode loopback --passphrase "${{ secrets.GPG_PASSPHRASE }}" --detach-sign --armor --default-key hq@rotko.net --output target/release/genpeerid.sig target/release/genpeerid
+          gpg --batch --yes --pinentry-mode loopback --passphrase "${{ secrets.GPG_PASSPHRASE }}" --detach-sign --armor --default-key hq@rotko.net --output target/release/genpeerid.sha512.sig target/release/genpeerid.sha512
 
-
+      # Upload artifacts
       - name: Upload Artifacts
         uses: actions/upload-artifact@v2
         with:
           name: genpeerid-and-signatures
           path: |
-            dist/genpeerid
-            dist/genpeerid.sig
-            dist/genpeerid.sha512
-            dist/genpeerid.sha512.sig
+            target/release/genpeerid
+            target/release/genpeerid.sig
+            target/release/genpeerid.sha512
+            target/release/genpeerid.sha512.sig
 
+      # Bump version and tag
       - name: Bump version and tag
-        id: bump_version
-        uses: anothrNick/github-tag-action@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
-          WITH_V: false
+        uses: anothrNick/github-tag-action@v1.38.0
+        with:
+          github_token: ${{ secrets.GH_PAT }}
 
+      # Create GitHub Release
       - name: Create Release
         uses: softprops/action-gh-release@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
         with:
           files: |
-            dist/genpeerid
-            dist/genpeerid.sig
-            dist/genpeerid.sha512
-            dist/genpeerid.sha512.sig
+            target/release/genpeerid
+            target/release/genpeerid.sig
+            target/release/genpeerid.sha512
+            target/release/genpeerid.sha512.sig
           tag_name: ${{ steps.bump_version.outputs.new_tag }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
