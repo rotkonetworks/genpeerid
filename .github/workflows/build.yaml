@@ -48,9 +48,9 @@ jobs:
           WITH_V: false
 
       - name: Create Release
-        uses: ncipollo/release-action@v1
-        with:
-          artifacts: "dist/genpeerid"
+        uses: softprops/action-gh-release@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GH_PAT }}
-
+        with:
+          files: dist/genpeerid
+          tag_name: ${{ steps.bump_version.outputs.new_tag }}
