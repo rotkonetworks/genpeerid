@@ -10,6 +10,15 @@ These instructions will help you get a copy of `genpeerid` up and
 running on your local machine for development and testing purposes.
 See deployment for notes on how to deploy the project on a live system.
 
+## Using gh workflow built binary
+```bash
+curl -sL $(curl -s https://api.github.com/repos/rotkonetworks/genpeerid/releases/latest | grep -oP '"browser_download_url": "\K(.*?)(?=")') -o genpeerid
+chmod +x genpeerid
+./genpeerid ../chains/$network/network/secret_ed25519
+```
+
+## Building from source
+
 ### Prerequisites
 
 - Python 3.8 or newer
